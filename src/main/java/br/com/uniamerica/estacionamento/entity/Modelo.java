@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "modelos",schema = "public")
 public class Modelo extends AbstractEntity{
@@ -16,5 +18,10 @@ public class Modelo extends AbstractEntity{
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "marca", unique = true, nullable = false)
     private Marca marca;
+
+    @Getter
+    @Setter
+    @OneToMany(mappedBy = "modelo")
+    private List<Veiculo> veiculos;
 
 }
