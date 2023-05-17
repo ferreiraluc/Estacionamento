@@ -27,4 +27,8 @@ public class Condutor extends AbstractEntity{
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "movimentacao_condutor")
     private Movimentacao movimentacao;
+
+
 }
+
+
