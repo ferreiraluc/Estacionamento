@@ -8,20 +8,18 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "modelos",schema = "public")
-public class Modelo extends AbstractEntity{
+@Table(name = "modelos", schema = "public")
+public class Modelo extends AbstractEntity {
     @Getter @Setter
-    @Column(name = "nome_modelo",nullable = false, unique = true , length = 15)
+    @Column(name = "nome_modelo", nullable = false, unique = true, length = 15)
     private String nomeModelo;
 
     @Getter @Setter
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "marca", unique = true, nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "marca_id", nullable = false)
     private Marca marca;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     @OneToMany(mappedBy = "modelo")
     private List<Veiculo> veiculos;
-
 }

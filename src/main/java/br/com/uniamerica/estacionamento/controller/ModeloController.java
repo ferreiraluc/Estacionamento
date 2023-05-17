@@ -1,6 +1,8 @@
 package br.com.uniamerica.estacionamento.controller;
 
-import br.com.uniamerica.estacionamento.entity.*;
+import br.com.uniamerica.estacionamento.entity.Modelo;
+import br.com.uniamerica.estacionamento.entity.Movimentacao;
+import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.ModeloRepository;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepository;
 import org.jetbrains.annotations.NotNull;
@@ -17,19 +19,21 @@ import java.util.Optional;
 public class ModeloController {
 
     @Autowired
-    ModeloRepository modeloRepository;
+    private ModeloRepository modeloRepository;
 
     @Autowired
-    VeiculoRepository veiculoRepository;
+    private VeiculoRepository veiculoRepository;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id){
-        return ResponseEntity.ok().body(this.modeloRepository.findById(id));
+    public ResponseEntity<?> findById(@PathVariable Long id) {
+        Optional<Modelo> modelo = modeloRepository.findById(id);
+
+        return modelo.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{ativo}")
-    public ResponseEntity<?> findByAtivo(@PathVariable boolean ativo){
-        List<Modelo> modelos = this.modeloRepository.findByAtivo(ativo);
+    @GetMapping("/ativo/{ativo}")
+    public ResponseEntity<?> findByAtivo(@PathVariable boolean ativo) {
+        List<Modelo> modelos = modeloRepository.findByAtivo(ativo);
 
         if (modelos.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -37,9 +41,10 @@ public class ModeloController {
 
         return ResponseEntity.ok().body(modelos);
     }
+
     @GetMapping
     public ResponseEntity<?> findAll() {
-        List<Modelo> modelos = this.modeloRepository.findAll();
+        List<Modelo> modelos = modeloRepository.findAll();
 
         if (modelos.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -50,31 +55,32 @@ public class ModeloController {
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody Modelo modelo) {
-        this.modeloRepository.save(modelo);
+        modeloRepository.save(modelo);
         return ResponseEntity.ok().body("Registro cadastrado com sucesso");
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable final @NotNull Long id, @RequestBody final Modelo modelo) {
-        if (id.equals(modelo.getId()) && !this.modeloRepository.findById(id).isEmpty()) {
-            this.modeloRepository.save(modelo);
+        if (id.equals(modelo.getId()) && modeloRepository.existsById(id)) {
+            modeloRepository.save(modelo);
+            return ResponseEntity.ok().body("Registro atualizado com sucesso");
         } else {
-            return ResponseEntity.badRequest().body("Id nao foi encontrado");
+            return ResponseEntity.badRequest().body("Id não foi encontrado");
         }
-        return ResponseEntity.ok().body("Registro atualizado com sucesso");
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
         Optional<Modelo> optionalModelo = modeloRepository.findById(id);
-        Optional<Veiculo> optionalVeiculo = veiculoRepository.findById(id);
+        Optional<Veiculo> optionalVeiculo = veiculoRepository.findByModeloId(id);
 
         if (optionalModelo.isPresent() && optionalVeiculo.isPresent()) {
             Veiculo veiculo = optionalVeiculo.get();
             Modelo modelo = optionalModelo.get();
-            Modelo modelov = veiculo.getModelo();
+            Modelo modeloVeiculo = veiculo.getModelo();
             Movimentacao movimentacao = veiculo.getMovimentacao();
 
-            if (movimentacao.isAtivo() && modelo != (modelov)) {
+            if (movimentacao.isAtivo() && !modelo.equals(modeloVeiculo)) {
                 modeloRepository.delete(modelo);
                 return ResponseEntity.ok("O registro do modelo foi deletado com sucesso");
             } else {
