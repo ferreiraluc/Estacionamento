@@ -52,6 +52,12 @@ public class MarcaController {
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody Marca marca) {
+        Optional<Marca> marcaExistente = marcaRepository.findByNomeMarca(marca.getNomeMarca());
+
+        if (marcaExistente.isPresent()) {
+            return ResponseEntity.badRequest().body("A marca já está cadastrada");
+        }
+
         this.marcaRepository.save(marca);
         return ResponseEntity.ok().body("Registro cadastrado com sucesso");
     }

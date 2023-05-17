@@ -7,10 +7,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MarcaRepository extends JpaRepository<Marca, Long> {
 
     @Query("From Marca where ativo = :ativo")
     public List<Marca> findByAtivo(@Param("ativo")final boolean ativo);
+
+    Optional<Marca> findByNomeMarca(String nomeMarca);
+
+
 }
