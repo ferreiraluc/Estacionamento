@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "marcas", schema = "public")
 public class Marca extends AbstractEntity {
     @Getter @Setter
-    @Column(name = "nome_marca",nullable = false, unique = true , length = 15)
+    @Column(name = "nome_marca", nullable = false, unique = true , length = 50)
     private String nomeMarca;
 
 }

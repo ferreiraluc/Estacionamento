@@ -7,5 +7,6 @@ public enum Cor {
     FANTASIA,
     PRETO,
     VERDE,
-    VERMELHO
+    VERMELHO,
+    PRATA
 }
